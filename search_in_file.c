@@ -30,25 +30,25 @@ int search_in_file(const char* filepath, const char* keyword, int* match_count, 
 }
 
 // 테스트용 main 함수
-int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "사용법: %s <키워드> <파일경로>\n", argv[0]);
-        return 1;
-    }
+// int main(int argc, char* argv[]) {
+//     if (argc != 3) {
+//         fprintf(stderr, "사용법: %s <키워드> <파일경로>\n", argv[0]);
+//         return 1;
+//     }
 
-    const char* keyword = argv[1];
-    const char* filepath = argv[2];
+//     const char* keyword = argv[1];
+//     const char* filepath = argv[2];
 
-    int matches = 0;
-    int lines = 0;
+//     int matches = 0;
+//     int lines = 0;
 
-    if (search_in_file(filepath, keyword, &matches, &lines) == 0) {
-        printf("파일: %s\n", filepath);
-        printf(" - 키워드 \"%s\" 총 등장 횟수: %d\n", keyword, matches);
-        printf(" - 키워드 포함 줄 수: %d\n", lines);
-    } else {
-        fprintf(stderr, "검색 실패!\n");
-    }
+//     if (search_in_file(filepath, keyword, &matches, &lines) == 0) {
+//         printf("파일: %s\n", filepath);
+//         printf(" - 키워드 \"%s\" 총 등장 횟수: %d\n", keyword, matches);
+//         printf(" - 키워드 포함 줄 수: %d\n", lines);
+//     } else {
+//         fprintf(stderr, "검색 실패!\n");
+//     }
 
-    return 0;
-}
+//     return 0;
+// }
