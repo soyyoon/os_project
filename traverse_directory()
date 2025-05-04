@@ -43,5 +43,8 @@ void traverse_directory(const char* dir_path) {
         }
     }
 
+
+//디렉토리 탐색 함수 구현: 하위 디렉토리까지 재귀적으로 순회 기능 (파일 스레드 생성 X)스레드 생성, 동기화, 결과 리스트는 포함xxxx
+
     closedir(dir);
 }
