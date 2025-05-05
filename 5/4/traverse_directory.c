@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <limits.h>
 
+#define PATH_MAX 1024
+
 // 디렉토리 재귀 순회 함수
 void traverse_directory(const char* dir_path) {
     DIR* dir = opendir(dir_path);
