@@ -1,3 +1,5 @@
+// search_in_file.c - 파일 내 키워드 검색(기본용)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

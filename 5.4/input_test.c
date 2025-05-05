@@ -20,6 +20,7 @@
 
 #define MAX_DIRS 5
 #define MAX_KEYWORD_LEN 128
+#define PATH_MAX 1024
 
 // 테스트용 디렉토리 경로 목록
 const char* test_dirs[MAX_DIRS] = {
