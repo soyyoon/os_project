@@ -1,41 +1,47 @@
 #!/bin/bash
 
-# 실행 파일 이름들 (현재 구조에 맞게 수정)
-GEN_INPUT=./generate_input           # 입력 생성기
-SINGLE=./file_search_single          # 싱글 스레드 버전
-MULTI=./file_search                  # 멀티 스레드 버전 (스레드 수 고정)
-
-KEYWORD="test"                       # 검색 키워드
+KEYWORD="apple"
 LOG_FILE="experiment_log.csv"
+CPU_LOG_DIR="cpu_logs"
 
-# 로그 헤더 초기화
-echo "실행모드,스레드수,파일수,디렉토리깊이,부합비율,심볼릭포함,실행시간(초)" > $LOG_FILE
+SINGLE=./file_search_single
+MULTI=./file_search
 
-# 파라미터 루프
-for T in 1 2 4 8; do                        # 실험 목적용 스레드 수 표시용 (실제로는 코드 내 고정)
-for N in 100 500 1000; do                  # 파일 수
-for D in 1 3; do                            # 디렉토리 깊이
-for M in 0 50 100; do                      # 키워드 포함 비율 (%)
-for S in include exclude; do              # 심볼릭 링크 포함 여부
+GEN_INPUT=./generate_input.sh
+
+mkdir -p $CPU_LOG_DIR
+echo "실행모드,스레드수,파일수,디렉토리깊이,부합비율,심볼릭포함,실행시간(초),UserTime,SysTime,CPU(%),MaxMemory(KB)" > $LOG_FILE
+
+for T in 1 2 4 8; do
+for N in 100 500; do
+for D in 1 3; do
+for M in 0 50 100; do
+for S in include exclude; do
 
     echo "▶️ 실행: T=$T, N=$N, D=$D, M=$M%, 심볼릭=$S"
-
-    # 입력 구조 생성
     $GEN_INPUT $D $N $(echo "$M/100" | bc -l) $S
 
-    # 싱글 스레드 실행
-    START=$(date +%s.%N)
-    echo "$KEYWORD" | $SINGLE --ext=.txt --max-depth=$D > /dev/null
-    END=$(date +%s.%N)
-    TIME_SINGLE=$(echo "$END - $START" | bc)
-    echo "single,$T,$N,$D,$M,$S,$TIME_SINGLE" >> $LOG_FILE
+    # 싱글 스레드
+    /usr/bin/time -v $SINGLE $KEYWORD --ext=.txt --max-depth=$D       1> /dev/null       2> $CPU_LOG_DIR/single.log
 
-    # 멀티 스레드 실행
-    START=$(date +%s.%N)
-    echo "$KEYWORD" | $MULTI --ext=.txt --max-depth=$D > /dev/null
-    END=$(date +%s.%N)
-    TIME_MULTI=$(echo "$END - $START" | bc)
-    echo "multi,$T,$N,$D,$M,$S,$TIME_MULTI" >> $LOG_FILE
+    TIME_SINGLE=$(grep "Elapsed (wall clock) time" $CPU_LOG_DIR/single.log | awk '{print $8}')
+    USER_TIME=$(grep "User time (seconds)" $CPU_LOG_DIR/single.log | awk '{print $5}')
+    SYS_TIME=$(grep "System time (seconds)" $CPU_LOG_DIR/single.log | awk '{print $5}')
+    CPU_PCT=$(grep "Percent of CPU this job got" $CPU_LOG_DIR/single.log | awk '{print $8}' | tr -d '%')
+    MAX_MEM=$(grep "Maximum resident set size" $CPU_LOG_DIR/single.log | awk '{print $6}')
+
+    echo "single,$T,$N,$D,$M,$S,$TIME_SINGLE,$USER_TIME,$SYS_TIME,$CPU_PCT,$MAX_MEM" >> $LOG_FILE
+
+    # 멀티 스레드
+    /usr/bin/time -v $MULTI $KEYWORD --ext=.txt --max-depth=$D       1> /dev/null       2> $CPU_LOG_DIR/multi.log
+
+    TIME_MULTI=$(grep "Elapsed (wall clock) time" $CPU_LOG_DIR/multi.log | awk '{print $8}')
+    USER_TIME=$(grep "User time (seconds)" $CPU_LOG_DIR/multi.log | awk '{print $5}')
+    SYS_TIME=$(grep "System time (seconds)" $CPU_LOG_DIR/multi.log | awk '{print $5}')
+    CPU_PCT=$(grep "Percent of CPU this job got" $CPU_LOG_DIR/multi.log | awk '{print $8}' | tr -d '%')
+    MAX_MEM=$(grep "Maximum resident set size" $CPU_LOG_DIR/multi.log | awk '{print $6}')
+
+    echo "multi,$T,$N,$D,$M,$S,$TIME_MULTI,$USER_TIME,$SYS_TIME,$CPU_PCT,$MAX_MEM" >> $LOG_FILE
 
 done; done; done; done; done
 
