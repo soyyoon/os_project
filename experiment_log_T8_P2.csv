@@ -1,0 +1,2 @@
+실행모드,파일수,디렉토리깊이,부합비율,심볼릭포함,실행시간(초),UserTime,SysTime,CPU(%),MaxMemory(KB)
+multi,500,3,0,include,,0.08,0.06,166,2768
