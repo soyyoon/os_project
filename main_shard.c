@@ -6,18 +6,39 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "file_search.h"
 
 #define MAX_DIRS 256
 #define PATH_STR 1024
 
 /* 1-depth 디렉터리 수집 */
-static int list_dirs(const char* root, char arr[][PATH_STR]){
-    int n=0; DIR* d=opendir(root); struct dirent* e;
-    while((e=readdir(d))){
-        if(e->d_type==DT_DIR && e->d_name[0]!='.')
-            snprintf(arr[n++],PATH_STR,"%s/%s",root,e->d_name);
-    } closedir(d); return n;
+static int list_dirs(const char* root, char arr[][PATH_STR])
+{
+    int n = 0;
+    DIR* d = opendir(root);
+    if (!d) {
+        perror("opendir"); return 0;
+    }
+
+    struct dirent* e;
+    while ((e = readdir(d))) {
+        if (e->d_name[0] == '.')        /* . .. 숨김 제외 */
+            continue;
+
+        char full[PATH_STR];
+        snprintf(full, sizeof(full), "%s/%s", root, e->d_name);
+
+        struct stat st;
+        if (lstat(full, &st) == 0 && S_ISDIR(st.st_mode)) {
+            /* 디렉터리면 배열에 저장 */
+            snprintf(arr[n++], PATH_STR, "%s", full);
+            if (n >= MAX_DIRS) break;   /* 넘침 방지 */
+        }
+    }
+    closedir(d);
+    return n;   /* 수집된 디렉터리 개수 반환 */
 }
 
 /* 스레드 인자 */
