@@ -81,7 +81,7 @@ int main(void) {
     return 0;
     }
     
-    pid_t pid = fork();
+    pid = fork();
     if (pid == 0) {
         scan_directory(ROOT_PATH, "Child");
         exit(0);
