@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #define KEYWORD "target"
-#define ROOT_PATH "./dataset"
+#define DEFAULT_PATH "./dataset"
 #define USE_MUTEX 1 // 0으로 바꾸면 비동기 실행
 #define MAX_DIRS 64
 
@@ -71,21 +71,23 @@ void* thread_func(void* arg) {
     return NULL;
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
 #if USE_MUTEX
     pthread_mutex_init(&print_lock, NULL);
 #endif
 
+    const char* root_path = (argc > 1) ? argv[1] : DEFAULT_PATH;
+
     char subdirs[MAX_DIRS][PATH_MAX] = {0};
     int count = 0;
 
-    DIR* dir = opendir(ROOT_PATH);
+    DIR* dir = opendir(root_path);
     if (!dir) return 1;
 
     struct dirent* entry;
     while ((entry = readdir(dir)) && count < MAX_DIRS) {
         if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
-            snprintf(subdirs[count++], PATH_MAX, "%s/%s", ROOT_PATH, entry->d_name);
+            snprintf(subdirs[count++], PATH_MAX, "%s/%s", root_path, entry->d_name);
         }
     }
     closedir(dir);
@@ -93,7 +95,6 @@ int main(void) {
     pthread_t tid;
     pthread_create(&tid, NULL, thread_func, subdirs);
 
-    // main thread는 짝수 인덱스 디렉토리 탐색
     for (int i = 0; i < MAX_DIRS; i += 2) {
         if (subdirs[i][0] != '\0') {
             scan_directory(subdirs[i]);

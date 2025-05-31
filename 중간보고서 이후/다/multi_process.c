@@ -11,7 +11,7 @@
 #include <sys/wait.h>
 
 #define KEYWORD "target"
-#define ROOT_PATH "./dataset"
+#define DEFAULT_PATH "./dataset"
 #define MAX_CHILDREN 8
 
 void search_in_file(const char* filepath, const char* role) {
@@ -48,8 +48,10 @@ void scan_directory(const char* path, const char* role) {
     closedir(dir);
 }
 
-int main(void) {
-    DIR* dir = opendir(ROOT_PATH);
+int main(int argc, char* argv[]) {
+    const char* path = (argc > 1) ? argv[1] : DEFAULT_PATH;
+
+    DIR* dir = opendir(path);
     if (!dir) return 1;
     struct dirent* entry;
     char subdirs[MAX_CHILDREN][PATH_MAX];
@@ -57,7 +59,7 @@ int main(void) {
 
     while ((entry = readdir(dir)) && count < MAX_CHILDREN) {
         if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            snprintf(subdirs[count++], PATH_MAX, "%s/%s", ROOT_PATH, entry->d_name);
+            snprintf(subdirs[count++], PATH_MAX, "%s/%s", path, entry->d_name);
         }
     }
     closedir(dir);

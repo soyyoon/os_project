@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 
 #define KEYWORD "target"
-#define ROOT_PATH "./dataset"
+#define DEFAULT_PATH "./dataset"
 #define MAX_CHILDREN 4
 #define MAX_THREADS 8
 #define USE_MUTEX 1
@@ -93,12 +93,14 @@ void run_child_with_threads(const char* path) {
     }
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
 #if USE_MUTEX
     pthread_mutex_init(&print_lock, NULL);
 #endif
 
-    DIR* dir = opendir(ROOT_PATH);
+    const char* path = (argc > 1) ? argv[1] : DEFAULT_PATH;
+
+    DIR* dir = opendir(path);
     if (!dir) return 1;
     struct dirent* entry;
     char subdirs[MAX_CHILDREN][PATH_MAX];
@@ -106,7 +108,7 @@ int main(void) {
 
     while ((entry = readdir(dir)) && count < MAX_CHILDREN) {
         if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            snprintf(subdirs[count], sizeof(subdirs[count]), "%s/%s", ROOT_PATH, entry->d_name);
+            snprintf(subdirs[count], sizeof(subdirs[count]), "%s/%s", path, entry->d_name);
             count++;
         }
     }
@@ -127,6 +129,5 @@ int main(void) {
 #if USE_MUTEX
     pthread_mutex_destroy(&print_lock);
 #endif
-
     return 0;
 }

@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 
 #define KEYWORD "target"
-#define ROOT_PATH "./dataset"
+#define DEFAULT_PATH "./dataset"
 
 void search_in_file(const char* filepath) {
     FILE* fp = fopen(filepath, "r");
@@ -50,7 +50,8 @@ void scan_directory(const char* path) {
     closedir(dir);
 }
 
-int main(void) {
-    scan_directory(ROOT_PATH);
+int main(int argc, char* argv[]) {
+    const char* path = (argc > 1) ? argv[1] : DEFAULT_PATH;
+    scan_directory(path);
     return 0;
-} 
+}

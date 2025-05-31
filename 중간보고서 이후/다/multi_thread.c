@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #define KEYWORD "target"
-#define ROOT_PATH "./dataset"
+#define DEFAULT_PATH "./dataset"
 #define MAX_THREADS 8
 #define USE_MUTEX 1
 
@@ -66,12 +66,14 @@ void* thread_func(void* arg) {
     return NULL;
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
 #if USE_MUTEX
     pthread_mutex_init(&print_lock, NULL);
 #endif
 
-    DIR* dir = opendir(ROOT_PATH);
+    const char* path = (argc > 1) ? argv[1] : DEFAULT_PATH;
+
+    DIR* dir = opendir(path);
     if (!dir) return 1;
     struct dirent* entry;
     char subdirs[MAX_THREADS][PATH_MAX];
@@ -81,7 +83,7 @@ int main(void) {
 
     while ((entry = readdir(dir)) && count < MAX_THREADS) {
         if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            snprintf(subdirs[count], sizeof(subdirs[count]), "%s/%s", ROOT_PATH, entry->d_name);
+            snprintf(subdirs[count], sizeof(subdirs[count]), "%s/%s", path, entry->d_name);
             strncpy(args[count].path, subdirs[count], PATH_MAX);
             count++;
         }
