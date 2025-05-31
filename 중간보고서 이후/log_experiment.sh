@@ -5,7 +5,7 @@ mkdir -p "$log_dir"
 result_csv="${log_dir}/results.csv"
 
 executables_abc=(  # [가],[나] 대상
-  "./child_once"
+  "./child_process"
   "./single_process"
   "./single_thread"
 )
