@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define KEYWORD "target"
+#define KEYWORD "apple"
 #define DEFAULT_PATH "./dataset"
 #define MAX_THREADS 8
 #define USE_MUTEX 1
