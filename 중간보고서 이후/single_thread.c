@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define KEYWORD "target"
+#define KEYWORD "apple"
 #define DEFAULT_PATH "./dataset"
 #define USE_MUTEX 1 // 0으로 바꾸면 비동기 실행
 #define MAX_DIRS 64
