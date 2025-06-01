@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define KEYWORD "target"
+#define KEYWORD "apple"
 #define DEFAULT_PATH "./dataset"
 #define MAX_CHILDREN 4
 #define MAX_THREADS 8
