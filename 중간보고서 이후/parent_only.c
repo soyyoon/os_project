@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <sys/stat.h>
 
-#define KEYWORD "target"
+#define KEYWORD "apple"
 #define DEFAULT_PATH "./dataset"
 
 void search_in_file(const char* filepath) {
